@@ -1,0 +1,5 @@
+check process sidekiq
+  with pidfile <%= @pid_file %>
+  start program = "/usr/bin/sudo -u <%= @user %> -s -- sh -c 'cd <%= @current_path %> && RAILS_ENV=<%= @rails_env %> bundle exec sidekiq -P <%= @pid_file %> -C <%= @conf_file %> -L <%= @log_file %> -d'" with timeout 90 seconds
+  stop program = "/usr/bin/sudo -u <%= @user %> -s -- sh -c 'cd <%= @current_path %> && bundle exec sidekiqctl stop <%= pid_file %>'" with timeout 90 seconds
+  group sidekiq_<%= @application %>_group
