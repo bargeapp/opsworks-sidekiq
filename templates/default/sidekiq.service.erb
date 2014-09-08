@@ -1,0 +1,43 @@
+#!/usr/local/bin/ruby
+
+ROOT_PATH = "<%= @deploy[:deploy_to] %>"
+PID_DIR = "<%= @deploy[:deploy_to] %>/shared/pids"
+LOG_DIR = "<%= @deploy[:deploy_to] %>/shared/log"
+CONF_FILE = "<%= @deploy[:deploy_to] %>/current/config/sidekiq.yml"
+
+ENV["RAILS_ENV"] = "<%= @deploy[:rails_env] %>"
+ENV["REDIS_URL"] = "<%= @deploy[:environment][:REDIS_URL] %>"
+
+def run_and_ignore_exitcode_and_print_command(command)
+  puts command
+  system(command)
+end
+
+def pid_file(worker_num)
+  "#{PID_DIR}/sidekiq_#{worker_num}.pid"
+end
+
+def log_file(worker_num)
+  "#{LOG_DIR}/sidekiq_#{worker_num}.log"
+end
+
+def start_sidekiq(worker_num)
+  run_and_ignore_exitcode_and_print_command "cd #{ROOT_PATH}/current && bundle exec sidekiq -P #{pid_file(worker_num)} -C #{CONF_FILE} -L #{log_file(worker_num)} -d"
+end
+
+def stop_sidekiq(worker_num)
+  run_and_ignore_exitcode_and_print_command "cd #{ROOT_PATH}/current && bundle exec sidekiqctl stop #{pid_file(worker_num)}"
+end
+
+
+case ARGV[0]
+when "start"
+  start_sidekiq ARGV[1]
+when "stop"
+  stop_sidekiq ARGV[1]
+else
+  puts "Usage: {start|stop} WORKER_ID"
+  exit 1
+end
+
+exit 0

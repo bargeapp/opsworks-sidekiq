@@ -1,4 +1,7 @@
 node[:deploy].each do |application, deploy|
-  next unless deploy[:sidekiq]
-  exec "monit stop sidekiq_#{application}"
+  execute "restart-sidekiq" do
+    command %Q{
+      echo "monit -g sidekiq_#{application} stop all" | at now
+    }
+  end
 end
