@@ -2,7 +2,6 @@
 
 ROOT_PATH = "<%= @deploy[:deploy_to] %>"
 PID_DIR = "<%= @deploy[:deploy_to] %>/shared/pids"
-LOG_DIR = "<%= @deploy[:deploy_to] %>/shared/log"
 CONF_FILE = "<%= @deploy[:deploy_to] %>/current/config/sidekiq.yml"
 
 ENV["RAILS_ENV"] = "<%= @deploy[:rails_env] %>"
@@ -17,12 +16,8 @@ def pid_file(worker_num)
   "#{PID_DIR}/sidekiq_#{worker_num}.pid"
 end
 
-def log_file(worker_num)
-  "#{LOG_DIR}/sidekiq_#{worker_num}.log"
-end
-
 def start_sidekiq(worker_num)
-  run_and_ignore_exitcode_and_print_command "cd #{ROOT_PATH}/current && bundle exec sidekiq -P #{pid_file(worker_num)} -C #{CONF_FILE} -L #{log_file(worker_num)} -d"
+  run_and_ignore_exitcode_and_print_command "cd #{ROOT_PATH}/current && bundle exec sidekiq -P #{pid_file(worker_num)} -C #{CONF_FILE} -L <%= @deploy[:deploy_to] %>/shared/log/sidekiq.log -d"
 end
 
 def stop_sidekiq(worker_num)
