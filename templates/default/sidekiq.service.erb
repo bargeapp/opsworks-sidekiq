@@ -5,7 +5,9 @@ PID_DIR = "<%= @deploy[:deploy_to] %>/shared/pids"
 CONF_FILE = "<%= @deploy[:deploy_to] %>/current/config/sidekiq.yml"
 
 ENV["RAILS_ENV"] = "<%= @deploy[:rails_env] %>"
-ENV["REDIS_URL"] = "<%= @deploy[:environment][:REDIS_URL] %>"
+<% @deploy[:environment].each do |k,v| %>
+ENV["<%= k %>"] = "<%= v %>"
+<% end %>
 
 def run_and_ignore_exitcode_and_print_command(command)
   puts command
