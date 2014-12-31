@@ -1,0 +1,11 @@
+#!upstart
+description "Sidekiq workers"
+
+<% @deploy[:environment].each do |k,v| %>
+env <%= k %>=<%= v %>
+export <%= k %>
+<% end %>
+
+start on runlevel [2345]
+
+stop on runlevel [016]

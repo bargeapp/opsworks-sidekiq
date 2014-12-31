@@ -1,0 +1,28 @@
+#!upstart
+description "Sidekiq worker <%= @instance %> <%= @queue %>"
+respawn
+start on starting sidekiq-<%= @application %>
+stop on stopping sidekiq-<%= @application %>
+
+env QUEUE=<%= @queue %>
+env RACK_ENV=<%= @rack_env %>
+env TERM_CHILD=1
+
+<%
+  concurrency = settings[:concurrency] || 25
+  queues_arg = ''
+  if settings[:queues] && settings[:queues].is_a?(Array)
+    settings[:queues].each do |q|
+      if q.is_a?(String)
+        queues_arg << "-q #{q}"
+      elsif q.is_a?(Array)
+        queues_arg << "-q #{q[0]},#{q[1]}"
+      end
+      queues_arg << ' '
+    end
+  end
+%>
+
+chdir <%= @deploy[:deploy_to] %>/current
+
+exec sudo -u deploy -E -- bundle exec sidekiq -c <%= concurrency %> <%= @queues_arg %> -L <%= @deploy[:deploy_to] %>/shared/log/sidekiq.log
