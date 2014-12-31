@@ -9,10 +9,10 @@ env RACK_ENV=<%= @rack_env %>
 env TERM_CHILD=1
 
 <%
-  concurrency = settings[:concurrency] || 25
+  concurrency = @settings[:concurrency] || 25
   queues_arg = ''
-  if settings[:queues] && settings[:queues].is_a?(Array)
-    settings[:queues].each do |q|
+  if @settings[:queues] && @settings[:queues].is_a?(Array)
+    @settings[:queues].each do |q|
       if q.is_a?(String)
         queues_arg << "-q #{q}"
       elsif q.is_a?(Array)
